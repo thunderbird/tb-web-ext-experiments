@@ -20,6 +20,7 @@ this.calendar_items = class extends ExtensionAPI {
       propsToItem,
       convertItem,
       convertAlarm,
+      createDate,
     } = ChromeUtils.import(this.extension.rootURI.resolve("experiments/calendar/ext-calendar-utils.jsm"));
 
     return {
@@ -118,6 +119,36 @@ this.calendar_items = class extends ExtensionAPI {
               throw new ExtensionError("Could not find item " + id);
             }
             await pcal.deleteItem(item);
+          },
+          query: async function(queryProps) {
+            let calendar = getResolvedCalendarById(context.extension, queryProps.calendarId);
+            let pcal = cal.async.promisifyCalendar(calendar);
+
+            let dateStart = createDate(0, 0, 0);
+            let dateEnd = createDate(9999, 30, 12);
+
+            let filter = queryProps.type ?
+              queryProps.type.reduce((filter, type) => {
+                let thisFilter = 0;
+                switch (type) {
+                  case "completed": thisFilter = Ci.callICalendar.ITEM_FILTER_COMPLETED_ALL; break;
+                  case "classOcurrences": thisFilter = Ci.callICalendar.ITEM_FILTER_CLASS_OCURRENCES; break;
+                }
+
+                return filter | thisFilter;
+              }, 0) :
+              Ci.calICalendar.ITEM_FILTER_ALL_ITEMS;
+
+            // Filter, ???, Date Range Begin, Date Range End
+            return (await pcal.getItems(filter, 0, dateStart, dateEnd))
+              .map(item => Object.assign(
+                convertItem(item, {}, context.extension),
+                {
+                  "percentComplete": item.percentComplete,
+                  "completed": item.isCompleted,
+                  "dueDate": new Date(item.entryDate.nativeTime / 1000)
+                }
+              ));
           },
 
           onCreated: new EventManager({

@@ -144,6 +144,21 @@
           { "type": "string", "name": "calendarId" },
           { "type": "string", "name": "id" }
         ]
+      },
+      {
+        "name": "query",
+        "async": true,
+        "type": "function",
+        "parameters": [
+          {
+            "name": "queryProps",
+            "type": "object",
+            "properties": {
+              "calendarId": {"type": "string"},
+              "type": {"type": "array", "items": {"type": "string"}, "optional": true}
+            }
+          }
+        ]
       }
     ],
     "events": [

@@ -12,6 +12,7 @@ var EXPORTED_SYMBOLS = [
   "propsToItem",
   "convertItem",
   "convertAlarm",
+  "createDate",
 ];
 
 var { XPCOMUtils } = ChromeUtils.import("resource://gre/modules/XPCOMUtils.jsm");
@@ -217,4 +218,19 @@ function convertAlarm(item, alarm) {
     offset: alarm.offset?.icalString,
     related: ALARM_RELATED_MAP[alarm.related],
   };
+}
+
+function createDate(aYear, aMonth, aDay, aHasTime, aHour, aMinute, aSecond, aTimezone) {
+  let date = Cc["@mozilla.org/calendar/datetime;1"].createInstance(Ci.calIDateTime);
+  date.resetTo(
+    aYear,
+    aMonth,
+    aDay,
+    aHour || 0,
+    aMinute || 0,
+    aSecond || 0,
+    aTimezone || cal.dtz.UTC
+  );
+  date.isDate = !aHasTime;
+  return date;
 }

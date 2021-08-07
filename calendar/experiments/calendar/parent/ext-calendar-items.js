@@ -5,6 +5,7 @@
 var { ExtensionCommon } = ChromeUtils.import("resource://gre/modules/ExtensionCommon.jsm");
 var { ExtensionUtils } = ChromeUtils.import("resource://gre/modules/ExtensionUtils.jsm");
 var { cal } = ChromeUtils.import("resource:///modules/calendar/calUtils.jsm");
+var { countOccurrences } = ChromeUtils.import("resource:///modules/calendar/calRecurrenceUtils.jsm");
 var { PromiseUtils } = ChromeUtils.import("resource://gre/modules/PromiseUtils.jsm");
 
 var { ExtensionAPI, EventManager } = ExtensionCommon;
@@ -17,6 +18,7 @@ this.calendar_items = class extends ExtensionAPI {
       getCachedCalendar,
       isCachedCalendar,
       isOwnCalendar,
+      getOccurrenceDate,
       propsToItem,
       convertItem,
       convertAlarm,
@@ -37,6 +39,10 @@ this.calendar_items = class extends ExtensionAPI {
             let listener = cal.async.promiseOperationListener(deferred);
             calendar.getItem(id, listener);
             let [item] = await deferred.promise;
+            let occurrenceDate = getOccurrenceDate(item, options);
+            if (occurrenceDate) {
+              item = item.recurrenceInfo.getOccurrenceFor(occurrenceDate);
+            }
 
             return convertItem(item, options, context.extension);
           },
@@ -67,6 +73,10 @@ this.calendar_items = class extends ExtensionAPI {
             let [oldItem] = await pcal.getItem(id);
             if (!oldItem) {
               throw new ExtensionError("Could not find item " + id);
+            }
+            let occurrenceDate = getOccurrenceDate(oldItem, updateProperties);
+            if (occurrenceDate) {
+              oldItem = oldItem.recurrenceInfo.getOccurrenceFor(occurrenceDate);
             }
             if (oldItem instanceof Ci.calIEvent) {
               updateProperties.type = "event";
@@ -109,7 +119,7 @@ this.calendar_items = class extends ExtensionAPI {
             await toCalendar.addItem(item);
             await fromCalendar.deleteItem(item);
           },
-          remove: async function(calendarId, id) {
+          remove: async function(calendarId, id, removeProperties) {
             let calendar = getResolvedCalendarById(context.extension, calendarId);
             let pcal = cal.async.promisifyCalendar(calendar);
 
@@ -117,7 +127,14 @@ this.calendar_items = class extends ExtensionAPI {
             if (!item) {
               throw new ExtensionError("Could not find item " + id);
             }
-            await pcal.deleteItem(item);
+            let occurrenceDate = getOccurrenceDate(item, removeProperties);
+            if (occurrenceDate && countOccurrences(item) > 1) {
+              let newItem = item.clone();
+              newItem.recurrenceInfo.removeOccurrenceAt(occurrenceDate);
+              await pcal.modifyItem(newItem, item);
+            } else {
+              await pcal.deleteItem(item);
+            }
           },
 
           onCreated: new EventManager({

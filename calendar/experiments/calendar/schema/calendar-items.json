@@ -14,8 +14,67 @@
           "description": { "type": "string", "optional": true },
           "location": { "type": "string", "optional": true },
           "categories": { "type": "array", "items": { "type": "string" }, "optional": true },
+          "priority": { "type": "integer", "optional": true },
+          "privacy": { "type": "string", "optional": true },
+          "status": { "type": "string", "optional": true },
+          "transparency": { "type": "string", "optional": true },
+          "created": { "type": "string", "optional": true },
+          "dtstamp": { "type": "string", "optional": true },
+          "lastModified": { "type": "string", "optional": true },
+          "alarms": { "type": "array", "items": { "$ref": "CalendarItemAlarm" }, "optional": true },
+          "organizer": { "$ref": "CalendarItemAttendee", "optional": true },
+          "attendees": { "type": "array", "items": { "$ref": "CalendarItemAttendee" }, "optional": true },
+          "recurrence": { "$ref": "CalendarItemRecurrence", "optional": true },
+          "occurrenceId": { "type": "string", "optional": true },
+          "occurrenceIndex": { "type": "integer", "optional": true },
           "startDate": { "type": "string", "optional": true },
+          "startTimezone": { "type": "string", "optional": true },
           "endDate": { "type": "string", "optional": true },
+          "endTimezone": { "type": "string", "optional": true },
+          "allday": { "type": "boolean", "optional": true },
+          "entryDate": { "type": "string", "optional": true },
+          "dueDate": { "type": "string", "optional": true },
+          "completedDate": { "type": "string", "optional": true },
+          "percentComplete": { "type": "integer", "optional": true },
+          "completed": { "type": "boolean", "optional": true },
+          "duration": { "type": "string", "optional": true },
+          "formats": { "$ref": "RawCalendarItem", "optional": true },
+          "metadata": { "type": "object", "additionalProperties": { "type": "any" }, "optional": true }
+        }
+      },
+      {
+        "id": "UpdateProperties",
+        "type": "object",
+        "description": "TODO split event/task. Add more jscalendar props. Use format: 'date'.",
+        "properties": {
+          "title": { "type": "string", "optional": true },
+          "description": { "type": "string", "optional": true },
+          "location": { "type": "string", "optional": true },
+          "categories": { "type": "array", "items": { "type": "string" }, "optional": true },
+          "priority": { "type": "integer", "optional": true },
+          "privacy": { "type": "string", "optional": true },
+          "status": { "type": "string", "optional": true },
+          "transparency": { "type": "string", "optional": true },
+          "created": { "type": "string", "optional": true },
+          "dtstamp": { "type": "string", "optional": true },
+          "lastModified": { "type": "string", "optional": true },
+          "alarms": { "type": "array", "items": { "$ref": "CalendarItemAlarm" }, "optional": true },
+          "organizer": { "$ref": "CalendarItemAttendee", "optional": true },
+          "attendees": { "type": "array", "items": { "$ref": "CalendarItemAttendee" }, "optional": true },
+          "recurrence": { "$ref": "CalendarItemRecurrence", "optional": true },
+          "occurrenceId": { "type": "string", "optional": true },
+          "occurrenceIndex": { "type": "integer", "optional": true },
+          "startDate": { "type": "string", "optional": true },
+          "startTimezone": { "type": "string", "optional": true },
+          "endDate": { "type": "string", "optional": true },
+          "endTimezone": { "type": "string", "optional": true },
+          "allday": { "type": "boolean", "optional": true },
+          "entryDate": { "type": "string", "optional": true },
+          "dueDate": { "type": "string", "optional": true },
+          "completedDate": { "type": "string", "optional": true },
+          "percentComplete": { "type": "integer", "optional": true },
+          "completed": { "type": "boolean", "optional": true },
+          "duration": { "type": "string", "optional": true },
           "formats": { "$ref": "RawCalendarItem", "optional": true },
           "metadata": { "type": "object", "additionalProperties": { "type": "any" }, "optional": true }
         }
@@ -47,14 +106,45 @@
         ]
       },
       {
+        "id": "CalendarItemRecurrence",
+        "type": "object",
+        "description": "TODO needs real structure",
+        "properties": {
+          "type": { "type": "string", "optional": true },
+          "startDate": { "type": "string", "optional": true },
+          "interval": { "type": "integer", "optional": true },
+          "firstDayOfWeek": { "type": "integer", "optional": true },
+          "days": { "type": "array", "items": { "type": "integer" }, "optional": true },
+          "dayOfMonth": { "type": "integer", "optional": true },
+          "monthOfYear": { "type": "integer", "optional": true },
+          "count": { "type": "integer", "optional": true },
+          "untilDate": { "type": "string", "optional": true },
+          "deletedIds": { "type": "array", "items": { "type": "string" }, "optional": true },
+          "deletedIndices": { "type": "array", "items": { "type": "integer" }, "optional": true },
+          "exceptions": { "type": "array", "items": { "$ref": "UpdateProperties" }, "optional": true }
+        }
+      },
+      {
+        "id": "CalendarItemAttendee",
+        "type": "object",
+        "description": "TODO needs real structure",
+        "properties": {
+          "email": { "type": "string" },
+          "name": { "type": "string", "optional": true },
+          "role": { "type": "string", "optional": true },
+          "userType": { "type": "string", "optional": true },
+          "participation": { "type": "string", "optional": true }
+        }
+      },
+      {
         "id": "CalendarItemAlarm",
         "type": "object",
         "description": "TODO needs real structure",
         "properties": {
-          "itemId": { "type": "string" },
+          "itemId": { "type": "string", "optional": "true" },
           "action": { "type": "string" },
-          "date": { "type": "string" },
-          "offset": { "type": "string" },
+          "date": { "type": "string", "optional": "true" },
+          "offset": { "type": "integer", "optional": "true" },
           "related": { "type": "string", "enum": ["absolute", "start", "end"] }
         }
       }
@@ -72,6 +162,8 @@
             "name": "getOptions",
             "optional": true,
             "properties": {
+              "occurrenceId": { "type": "string", "optional": true },
+              "occurrenceIndex": { "type": "integer", "optional": true },
               "returnFormat": { "$ref": "ReturnFormat", "optional": true }
             }
           }
@@ -93,8 +185,28 @@
               "description": { "type": "string", "optional": true },
               "location": { "type": "string", "optional": true },
               "categories": { "type": "array", "items": { "type": "string" }, "optional": true },
+              "priority": { "type": "integer", "optional": true },
+              "privacy": { "type": "string", "optional": true },
+              "status": { "type": "string", "optional": true },
+              "transparency": { "type": "string", "optional": true },
+              "created": { "type": "string", "optional": true },
+              "dtstamp": { "type": "string", "optional": true },
+              "lastModified": { "type": "string", "optional": true },
+              "alarms": { "type": "array", "items": { "$ref": "CalendarItemAlarm" }, "optional": true },
+              "organizer": { "$ref": "CalendarItemAttendee", "optional": true },
+              "attendees": { "type": "array", "items": { "$ref": "CalendarItemAttendee" }, "optional": true },
+              "recurrence": { "$ref": "CalendarItemRecurrence", "optional": true },
               "startDate": { "type": "string", "optional": true },
+              "startTimezone": { "type": "string", "optional": true },
               "endDate": { "type": "string", "optional": true },
+              "endTimezone": { "type": "string", "optional": true },
+              "allday": { "type": "boolean", "optional": true },
+              "entryDate": { "type": "string", "optional": true },
+              "dueDate": { "type": "string", "optional": true },
+              "completedDate": { "type": "string", "optional": true },
+              "percentComplete": { "type": "integer", "optional": true },
+              "completed": { "type": "boolean", "optional": true },
+              "duration": { "type": "string", "optional": true },
               "formats": { "$ref": "RawCalendarItem", "optional": true },
               "returnFormat": { "$ref": "ReturnFormat", "optional": true },
               "metadata": { "type": "object", "properties": {}, "additionalProperties": { "type": "any" }, "optional": true }
@@ -109,21 +221,7 @@
         "parameters": [
           { "type": "string", "name": "calendarId" },
           { "type": "string", "name": "id" },
-          {
-            "name": "updateProperties",
-            "type": "object",
-            "properties": {
-              "title": { "type": "string", "optional": true },
-              "description": { "type": "string", "optional": true },
-              "location": { "type": "string", "optional": true },
-              "categories": { "type": "array", "items": { "type": "string" }, "optional": true },
-              "startDate": { "type": "string", "optional": true },
-              "endDate": { "type": "string", "optional": true },
-              "formats": { "$ref": "RawCalendarItem", "optional": true },
-              "returnFormat": { "$ref": "ReturnFormat", "optional": true },
-              "metadata": { "type": "object", "additionalProperties": { "type": "any" }, "optional": true }
-            }
-          }
+          { "$ref": "UpdateProperties", "name": "updateProperties" }
         ]
       },
       {
@@ -142,7 +240,16 @@
         "type": "function",
         "parameters": [
           { "type": "string", "name": "calendarId" },
-          { "type": "string", "name": "id" }
+          { "type": "string", "name": "id" },
+          {
+            "name": "removeProperties",
+            "type": "object",
+            "optional": true,
+            "properties": {
+              "occurrenceId": { "type": "string", "optional": true },
+              "occurrenceIndex": { "type": "integer", "optional": true }
+            }
+          }
         ]
       }
     ],

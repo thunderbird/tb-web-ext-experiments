@@ -174,6 +174,8 @@ function convertItem(item, options, extension) {
   props.description = item.getProperty("description") || "";
   props.location = item.getProperty("location") || "";
   props.categories = item.getCategories();
+  props.startDate = item.startDate ? item.startDate.icalString : "";
+  props.endDate = item.endDate ? item.endDate.icalString : "";
 
   if (isOwnCalendar(item.calendar, extension)) {
     props.metadata = {};
